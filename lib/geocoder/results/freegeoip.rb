@@ -3,11 +3,6 @@ require 'geocoder/results/base'
 module Geocoder::Result
   class Freegeoip < Base
 
-    def address(format = :full)
-      s = state_code.to_s == "" ? "" : ", #{state_code}"
-      "#{city}#{s} #{postal_code}, #{country}".sub(/^[ ,]*/, "")
-    end
-
     def city
       @data['city']
     end
@@ -33,7 +28,7 @@ module Geocoder::Result
     end
 
     def self.response_attributes
-      %w[metrocode ip]
+      %w[metro_code ip]
     end
 
     response_attributes.each do |a|

@@ -13,7 +13,7 @@ module Geocoder::Lookup
     end
 
     def query_url(query)
-      "#{ protocol }://geo.pointp.in/#{ api_key }/json/#{ query.sanitized_text }"
+      "#{protocol}://geo.pointp.in/#{configuration.api_key}/json/#{query.sanitized_text}"
     end
 
   private
@@ -46,6 +46,7 @@ module Geocoder::Lookup
       parsed_data.keys.include?('error')
     end
 
+    # TODO: replace this hash with what's actually returned by Pointpin
     def reserved_result(ip)
       {
         "ip"           => ip,
@@ -59,10 +60,6 @@ module Geocoder::Lookup
         "country_name" => "Reserved",
         "country_code" => "RD"
       }
-    end
-
-    def api_key
-      configuration.api_key
     end
   end
 end

@@ -3,29 +3,23 @@ require 'geocoder/results/base'
 module Geocoder
   module Result
     class Geoip2 < Base
-      def address(format = :full)
-        s = state.to_s == '' ? '' : ", #{state_code}"
-        "#{city}#{s} #{postal_code}, #{country}".sub(/^[ ,]*/, '')
-      end
 
       def coordinates
-        [latitude, longitude]
-      end
-
-      def latitude
-        data.fetch('location', {}).fetch('latitude', 0.0)
-      end
-
-      def longitude
-        data.fetch('location', {}).fetch('longitude', 0.0)
+        %w[latitude longitude].map do |l|
+          data.fetch('location', {}).fetch(l, 0.0)
+        end
       end
 
       def city
-        data.fetch('city', {}).fetch('names', {}).fetch(locale, '')
+        fetch_name(
+          data.fetch('city', {}).fetch('names', {})
+        )
       end
 
       def state
-        data.fetch('subdivisions', []).fetch(0, {}).fetch('names', {}).fetch(locale, '')
+        fetch_name(
+          data.fetch('subdivisions', []).fetch(0, {}).fetch('names', {})
+        )
       end
 
       def state_code
@@ -33,7 +27,9 @@ module Geocoder
       end
 
       def country
-        data.fetch('country', {}).fetch('names', {}).fetch(locale, '')
+        fetch_name(
+          data.fetch('country', {}).fetch('names', {})
+        )
       end
 
       def country_code
@@ -54,14 +50,26 @@ module Geocoder
         end
       end
 
-      private
+      def language=(l)
+        @language = l.to_s
+      end
+
+      def language
+        @language ||= default_language
+      end
 
       def data
         @data.to_hash
       end
 
-      def locale
-        @locale ||= Geocoder.config[:language].to_s
+      private
+
+      def default_language
+        @default_language = Geocoder.config[:language].to_s
+      end
+
+      def fetch_name(names)
+        names[language] || names[default_language] || ''
       end
     end
   end

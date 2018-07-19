@@ -4,9 +4,7 @@ module Geocoder::Result
   class Nominatim < Base
 
     def poi
-      %w[building university school hospital mall hotel restaurant stadium bus_stop tram_stop].each do |key|
-        return @data['address'][key] if @data['address'].key?(key)
-      end
+      return @data['address'][place_type] if @data['address'].key?(place_type)
       return nil
     end
 
@@ -64,6 +62,18 @@ module Geocoder::Result
 
     def suburb
       @data['address']['suburb']
+    end
+
+    def city_district
+      @data['address']['city_district']
+    end
+
+    def state_district
+      @data['address']['state_district']
+    end
+
+    def neighbourhood
+      @data['address']['neighbourhood']
     end
 
     def coordinates

@@ -23,11 +23,13 @@ module Geocoder
     #
     def street_services
       @street_services ||= [
+        :location_iq,
         :dstk,
         :esri,
         :google,
         :google_premier,
         :google_places_details,
+        :google_places_search,
         :bing,
         :geocoder_ca,
         :geocoder_us,
@@ -37,17 +39,19 @@ module Geocoder
         :mapquest,
         :mapzen,
         :opencagedata,
-        :ovi,
         :pelias,
+        :pickpoint,
         :here,
         :baidu,
         :geocodio,
         :smarty_streets,
-        :okf,
         :postcode_anywhere_uk,
+        :postcodes_io,
         :geoportail_lu,
+        :ban_data_gouv_fr,
         :test,
-        :latlon
+        :latlon,
+        :amap
       ]
     end
 
@@ -65,7 +69,10 @@ module Geocoder
         :pointpin,
         :maxmind_geoip2,
         :ipinfo_io,
-        :ipapi_com
+        :ipapi_com,
+        :ipdata_co,
+        :db_ip_com,
+        :ipstack,
       ]
     end
 

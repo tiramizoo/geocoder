@@ -15,7 +15,12 @@ if configs.keys.include? ENV['DB']
   ActiveRecord::Base.configurations = configs
 
   db_name = ENV['DB']
-  ActiveRecord::Base.establish_connection(db_name)
+  if db_name == 'sqlite' && ENV['USE_SQLITE_EXT'] == '1' then
+    gem 'sqlite_ext'
+    require 'sqlite_ext'
+    SqliteExt.register_ruby_math
+  end
+  ActiveRecord::Base.establish_connection(db_name.to_sym)
   ActiveRecord::Base.default_timezone = :utc
 
   ActiveRecord::Migrator.migrate('test/db/migrate', nil)
@@ -70,6 +75,10 @@ else
         def primary_key
           :id
         end
+
+        def maximum(_field)
+          1.0
+        end
       end
     end
   end
@@ -120,12 +129,16 @@ module Geocoder
         fixture_exists?(filename) ? filename : default_fixture_filename
       end
 
+      # This alias allows us to use this method in further tests
+      # to actually test http requests
+      alias_method :actual_make_api_request, :make_api_request
       remove_method(:make_api_request)
 
       def make_api_request(query)
         raise Timeout::Error if query.text == "timeout"
         raise SocketError if query.text == "socket_error"
         raise Errno::ECONNREFUSED if query.text == "connection_refused"
+        raise Errno::EHOSTUNREACH if query.text == "host_unreachable"
         if query.text == "invalid_json"
           return MockHttpResponse.new(:body => 'invalid json', :code => 200)
         end
@@ -145,6 +158,14 @@ module Geocoder
         else
           super
         end
+      end
+    end
+
+    require 'geocoder/lookups/db_ip_com'
+    class DbIpCom
+      private
+      def fixture_prefix
+        "db_ip_com"
       end
     end
 
@@ -172,6 +193,14 @@ module Geocoder
       end
     end
 
+    require 'geocoder/lookups/location_iq'
+    class LocationIq
+      private
+      def fixture_prefix
+        "location_iq"
+      end
+    end
+
     require 'geocoder/lookups/yandex'
     class Yandex
       private
@@ -185,6 +214,14 @@ module Geocoder
       private
       def default_fixture_filename
         "freegeoip_74_200_247_59"
+      end
+    end
+
+    require 'geocoder/lookups/ipstack'
+    class Ipstack
+      private
+      def default_fixture_filename
+        "ipstack_134_201_250_155"
       end
     end
 
@@ -281,14 +318,6 @@ module Geocoder
       end
     end
 
-    require 'geocoder/lookups/okf'
-    class Okf
-      private
-      def default_fixture_filename
-        "okf_kirstinmaki"
-      end
-    end
-
     require 'geocoder/lookups/postcode_anywhere_uk'
     class PostcodeAnywhereUk
       private
@@ -298,6 +327,18 @@ module Geocoder
 
       def default_fixture_filename
         "#{fixture_prefix}_romsey"
+      end
+    end
+
+    require 'geocoder/lookups/postcodes_io'
+    class PostcodesIo
+      private
+      def fixture_prefix
+        'postcodes_io'
+      end
+
+      def default_fixture_filename
+        "#{fixture_prefix}_malvern_hills"
       end
     end
 
@@ -341,6 +382,42 @@ module Geocoder
       private
       def default_fixture_filename
         "ipapi_com_74_200_247_59"
+      end
+    end
+
+    require 'geocoder/lookups/ipdata_co'
+    class IpdataCo
+      private
+      def default_fixture_filename
+        "ipdata_co_74_200_247_59"
+      end
+    end
+
+    require 'geocoder/lookups/ban_data_gouv_fr'
+    class BanDataGouvFr
+      private
+      def fixture_prefix
+        "ban_data_gouv_fr"
+      end
+
+      def default_fixture_filename
+        "#{fixture_prefix}_rue_yves_toudic"
+      end
+    end
+
+    require 'geocoder/lookups/amap'
+    class Amap
+      private
+      def default_fixture_filename
+        "amap_shanghai_pearl_tower"
+      end
+    end
+
+    require 'geocoder/lookups/pickpoint'
+    class Pickpoint
+      private
+      def fixture_prefix
+        "pickpoint"
       end
     end
 

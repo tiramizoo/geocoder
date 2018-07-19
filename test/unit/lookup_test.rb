@@ -24,7 +24,7 @@ class LookupTest < GeocoderTestCase
 
   def test_query_url_contains_values_in_params_hash
     Geocoder::Lookup.all_services_except_test.each do |l|
-      next if [:freegeoip, :maxmind_local, :telize, :pointpin, :geoip2, :maxmind_geoip2, :mapbox, :ipinfo_io, :ipapi_com].include? l # does not use query string
+      next if [:freegeoip, :maxmind_local, :telize, :pointpin, :geoip2, :maxmind_geoip2, :mapbox, :ipdata_co, :ipinfo_io, :ipapi_com, :ipstack, :postcodes_io].include? l # does not use query string
       set_api_key!(l)
       url = Geocoder::Lookup.get(l).query_url(Geocoder::Query.new(
         "test", :params => {:one_in_the_hand => "two in the bush"}
@@ -74,7 +74,7 @@ class LookupTest < GeocoderTestCase
   def test_raises_exception_on_invalid_key
     Geocoder.configure(:always_raise => [Geocoder::InvalidApiKey])
     #Geocoder::Lookup.all_services_except_test.each do |l|
-    [:bing, :yandex, :maxmind, :baidu, :baidu_ip].each do |l|
+    [:bing, :yandex, :maxmind, :baidu, :baidu_ip, :amap].each do |l|
       lookup = Geocoder::Lookup.get(l)
       assert_raises Geocoder::InvalidApiKey do
         lookup.send(:results, Geocoder::Query.new("invalid key"))
@@ -85,7 +85,7 @@ class LookupTest < GeocoderTestCase
   def test_returns_empty_array_on_invalid_key
     silence_warnings do
       #Geocoder::Lookup.all_services_except_test.each do |l|
-      [:bing, :yandex, :maxmind, :baidu, :baidu_ip].each do |l|
+      [:bing, :yandex, :maxmind, :baidu, :baidu_ip, :amap].each do |l|
         Geocoder.configure(:lookup => l)
         set_api_key!(l)
         assert_equal [], Geocoder.search("invalid key")
@@ -115,6 +115,12 @@ class LookupTest < GeocoderTestCase
     Geocoder.configure(:api_key => "MY_KEY")
     g = Geocoder::Lookup::Baidu.new
     assert_match "ak=MY_KEY", g.query_url(Geocoder::Query.new("Madison Square Garden, New York, NY  10001, United States"))
+  end
+
+  def test_db_ip_com_api_key
+    Geocoder.configure(:api_key => "MY_KEY")
+    g = Geocoder::Lookup::DbIpCom.new
+    assert_match "\/MY_KEY\/", g.query_url(Geocoder::Query.new("232.65.123.94"))
   end
 
   def test_pointpin_api_key
@@ -147,8 +153,14 @@ class LookupTest < GeocoderTestCase
     assert_match "token=MY_KEY", g.query_url(Geocoder::Query.new("232.65.123.94"))
   end
 
+  def test_amap_api_key
+    Geocoder.configure(:api_key => "MY_KEY")
+    g = Geocoder::Lookup::Amap.new
+    assert_match "key=MY_KEY", g.query_url(Geocoder::Query.new("202.198.16.3"))
+  end
+
   def test_raises_configuration_error_on_missing_key
-    [:bing, :baidu].each do |l|
+    [:bing, :baidu, :amap].each do |l|
       assert_raises Geocoder::ConfigurationError do
         Geocoder.configure(:lookup => l, :api_key => nil)
         Geocoder.search("Madison Square Garden, New York, NY  10001, United States")
