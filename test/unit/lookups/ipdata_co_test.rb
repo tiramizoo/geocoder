@@ -12,6 +12,20 @@ class IpdataCoTest < GeocoderTestCase
     assert result.is_a?(Geocoder::Result::IpdataCo)
   end
 
+  def test_result_on_loopback_ip_address_search
+    result = Geocoder.search("127.0.0.1").first
+    assert_equal "127.0.0.1", result.ip
+    assert_equal 'RD',        result.country_code
+    assert_equal "Reserved",  result.country
+  end
+
+  def test_result_on_private_ip_address_search
+    result = Geocoder.search("172.19.0.1").first
+    assert_equal "172.19.0.1", result.ip
+    assert_equal 'RD',         result.country_code
+    assert_equal "Reserved",   result.country
+  end
+
   def test_invalid_json
     Geocoder.configure(:always_raise => [Geocoder::ResponseParseError])
     assert_raise Geocoder::ResponseParseError do
@@ -42,7 +56,7 @@ class IpdataCoTest < GeocoderTestCase
 
     require 'webmock/test_unit'
     WebMock.enable!
-    stubbed_request = WebMock.stub_request(:get, "https://api.ipdata.co/8.8.8.8").with(headers: {'api-key' => 'XXXX'}).to_return(status: 200)
+    stubbed_request = WebMock.stub_request(:get, "https://api.ipdata.co/8.8.8.8?api-key=XXXX").to_return(status: 200)
 
     g = Geocoder::Lookup::IpdataCo.new
     g.send(:actual_make_api_request, Geocoder::Query.new('8.8.8.8'))

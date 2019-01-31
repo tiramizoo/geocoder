@@ -21,11 +21,11 @@ module Geocoder::Lookup
       end
     end
 
-    def query_url(query)
-      "#{protocol}://maps.googleapis.com/maps/api/geocode/json?" + url_query_string(query)
-    end
-
     private # ---------------------------------------------------------------
+
+    def base_query_url(query)
+      "#{protocol}://maps.googleapis.com/maps/api/geocode/json?"
+    end
 
     def configure_ssl!(client)
       client.instance_eval {
@@ -52,11 +52,11 @@ module Geocoder::Lookup
         raise_error(Geocoder::OverQueryLimitError) ||
           Geocoder.log(:warn, "#{name} API error: over query limit.")
       when "REQUEST_DENIED"
-        raise_error(Geocoder::RequestDenied) ||
-          Geocoder.log(:warn, "#{name} API error: request denied.")
+        raise_error(Geocoder::RequestDenied, doc['error_message']) ||
+          Geocoder.log(:warn, "#{name} API error: request denied (#{doc['error_message']}).")
       when "INVALID_REQUEST"
-        raise_error(Geocoder::InvalidRequest) ||
-          Geocoder.log(:warn, "#{name} API error: invalid request.")
+        raise_error(Geocoder::InvalidRequest, doc['error_message']) ||
+          Geocoder.log(:warn, "#{name} API error: invalid request (#{doc['error_message']}).")
       end
       return []
     end

@@ -8,28 +8,17 @@ module Geocoder::Lookup
       "Ipinfo.io"
     end
 
-    def query_url(query)
-      if configuration.api_key
-        "#{protocol}://ipinfo.io/#{query.sanitized_text}/geo?" + url_query_string(query)
-      else
-        "#{protocol}://ipinfo.io/#{query.sanitized_text}/geo"
-      end
-    end
-
-    # HTTPS available only for paid plans
-    def supported_protocols
-      if configuration.api_key
-        [:http, :https]
-      else
-        [:http]
-      end
-    end
-
     private # ---------------------------------------------------------------
 
+    def base_query_url(query)
+      url = "#{protocol}://ipinfo.io/#{query.sanitized_text}/geo"
+      url << "?" if configuration.api_key
+      url
+    end
+
     def results(query)
-      # don't look up a loopback address, just return the stored result
-      return [reserved_result(query.text)] if query.loopback_ip_address?
+      # don't look up a loopback or private address, just return the stored result
+      return [reserved_result(query.text)] if query.internal_ip_address?
 
       if !(doc = fetch_data(query)).is_a?(Hash) or doc['error']
         []

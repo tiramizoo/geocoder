@@ -217,6 +217,14 @@ module Geocoder
       end
     end
 
+    require 'geocoder/lookups/ip2location'
+    class Ip2location
+      private
+      def default_fixture_filename
+        "ip2location_8_8_8_8"
+      end
+    end
+
     require 'geocoder/lookups/ipstack'
     class Ipstack
       private
@@ -310,6 +318,14 @@ module Geocoder
       end
     end
 
+    require 'geocoder/lookups/tencent'
+    class Tencent
+      private
+      def default_fixture_filename
+        "tencent_shanghai_pearl_tower"
+      end
+    end
+
     require 'geocoder/lookups/geocodio'
     class Geocodio
       private
@@ -359,13 +375,6 @@ module Geocoder
       private
       def default_fixture_filename
         "latlon_6000_universal_blvd"
-      end
-    end
-
-    require 'geocoder/lookups/mapzen'
-    class Mapzen
-      def fixture_prefix
-        'pelias'
       end
     end
 

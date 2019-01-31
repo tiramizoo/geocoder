@@ -16,13 +16,9 @@ module Geocoder::Lookup
       ["key"]
     end
 
-    def query_url(query)
-      base_url(query) + url_query_string(query)
-    end
-
     private # ---------------------------------------------------------------
 
-    def base_url(query)
+    def base_query_url(query)
       text = CGI.escape(query.sanitized_text.strip)
       url = "#{protocol}://dev.virtualearth.net/REST/v1/Locations/"
       if query.reverse_geocode?
@@ -57,7 +53,8 @@ module Geocoder::Lookup
 
     def query_url_params(query)
       {
-        key: configuration.api_key
+        key: configuration.api_key,
+        language: (query.language || configuration.language)
       }.merge(super)
     end
 

@@ -46,6 +46,20 @@ class TelizeTest < GeocoderTestCase
     assert result.is_a?(Geocoder::Result::Telize)
   end
 
+  def test_result_on_loopback_ip_address_search
+    result = Geocoder.search("127.0.0.1").first
+    assert_equal "127.0.0.1", result.ip
+    assert_equal '',          result.country_code
+    assert_equal '',          result.country
+  end
+
+  def test_result_on_private_ip_address_search
+    result = Geocoder.search("172.19.0.1").first
+    assert_equal "172.19.0.1", result.ip
+    assert_equal '',           result.country_code
+    assert_equal '',           result.country
+  end
+
   def test_result_components
     result = Geocoder.search("74.200.247.59").first
     assert_equal "Jersey City, NJ 07302, United States", result.address
@@ -54,12 +68,22 @@ class TelizeTest < GeocoderTestCase
   end
 
   def test_no_results
-    results = Geocoder.search("10.10.10.10")
+    results = Geocoder.search("8.8.8.8")
     assert_equal 0, results.length
   end
 
   def test_invalid_address
     results = Geocoder.search("555.555.555.555", ip_address: true)
     assert_equal 0, results.length
+  end
+
+  def test_cache_key_strips_off_query_string
+    Geocoder.configure(telize: {api_key: "xxxxx"})
+    lookup = Geocoder::Lookup.get(:telize)
+    query = Geocoder::Query.new("8.8.8.8")
+    qurl = lookup.send(:query_url, query)
+    key = lookup.send(:cache_key, query)
+    assert qurl.include?("mashape-key")
+    assert !key.include?("mashape-key")
   end
 end

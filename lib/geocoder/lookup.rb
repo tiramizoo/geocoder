@@ -37,12 +37,12 @@ module Geocoder
         :nominatim,
         :mapbox,
         :mapquest,
-        :mapzen,
         :opencagedata,
         :pelias,
         :pickpoint,
         :here,
         :baidu,
+        :tencent,
         :geocodio,
         :smarty_streets,
         :postcode_anywhere_uk,
@@ -73,6 +73,7 @@ module Geocoder
         :ipdata_co,
         :db_ip_com,
         :ipstack,
+        :ip2location
       ]
     end
 

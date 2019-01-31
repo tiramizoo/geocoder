@@ -60,7 +60,7 @@ module Geocoder::Store
         # corner followed by the northeast corner of the box
         # (<tt>[[sw_lat, sw_lon], [ne_lat, ne_lon]]</tt>).
         #
-        scope :within_bounding_box, lambda{ |bounds|
+        scope :within_bounding_box, lambda{ |*bounds|
           sw_lat, sw_lng, ne_lat, ne_lng = bounds.flatten if bounds
           if sw_lat && sw_lng && ne_lat && ne_lng
             where(Geocoder::Sql.within_bounding_box(
@@ -165,8 +165,6 @@ module Geocoder::Store
           :order => options.include?(:order) ? options[:order] : "#{distance_column} ASC"
         }
       end
-
-      private # ----------------------------------------------------------------
 
       ##
       # SQL for calculating distance based on the current database's

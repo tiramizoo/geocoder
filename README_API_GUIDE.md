@@ -15,9 +15,9 @@ Street Address Lookups
 
 ### Google (`:google`)
 
-* **API key**: optional, but quota is higher if key is used (use of key requires HTTPS so be sure to set: `use_https: true` in `Geocoder.configure`)
-* **Key signup**: https://console.developers.google.com/flows/enableapi?apiid=geocoding_backend&keyType=SERVER_SIDE
-* **Quota**: 2,500 requests/24 hrs, 5 requests/second
+* **API key**: required
+* **Key signup**: https://developers.google.com/maps/documentation/geocoding/usage-and-billing
+* **Quota**: pay-as-you-go pricing; 50 requests/second
 * **Region**: world
 * **SSL support**: yes (required if key is used)
 * **Languages**: see https://developers.google.com/maps/faq#languagesupport
@@ -33,7 +33,7 @@ Street Address Lookups
 Similar to `:google`, with the following differences:
 
 * **API key**: required, plus client and channel (set `Geocoder.configure(lookup: :google_premier, api_key: [key, client, channel])`)
-* **Key signup**: https://developers.google.com/maps/documentation/business/
+* **Key signup**: https://developers.google.com/maps/premium/
 * **Quota**: 100,000 requests/24 hrs, 10 requests/second
 
 ### Google Places Details (`:google_places_details`)
@@ -63,7 +63,7 @@ The [Google Places Search API](https://developers.google.com/places/web-service/
 * **Quota**: 50,0000 requests/day (Windows app), 125,000 requests/year (non-Windows app)
 * **Region**: world
 * **SSL support**: no
-* **Languages**: ?
+* **Languages**: The preferred language of address elements in the result. Language code must be provided according to RFC 4647 standard.
 * **Documentation**: http://msdn.microsoft.com/en-us/library/ff701715.aspx
 * **Terms of Service**: http://www.microsoft.com/maps/product/terms.html
 * **Limitations**: No country codes or state names. Must be used on "public-facing, non-password protected web sites," "in conjunction with Bing Maps or an application that integrates Bing Maps."
@@ -76,7 +76,7 @@ The [Google Places Search API](https://developers.google.com/places/web-service/
 * **SSL support**: yes
 * **Languages**: ?
 * **Documentation**: http://wiki.openstreetmap.org/wiki/Nominatim
-* **Terms of Service**: http://wiki.openstreetmap.org/wiki/Nominatim_usage_policy
+* **Terms of Service**: https://operations.osmfoundation.org/policies/nominatim/
 * **Limitations**: Please limit request rate to 1 per second and include your contact information in User-Agent headers (eg: `Geocoder.configure(http_headers: { "User-Agent" => "your contact info" })`). [Data licensed under Open Database License (ODbL) (you must provide attribution).](http://www.openstreetmap.org/copyright)
 
 ### PickPoint (`:pickpoint`)
@@ -128,10 +128,10 @@ The [Google Places Search API](https://developers.google.com/places/web-service/
 
 * **API key**: none
 * **Quota**: ?
-* **Region**: US and Canada
+* **Region**: US, Canada, Mexico
 * **SSL support**: no
 * **Languages**: English
-* **Documentation**: ?
+* **Documentation**: https://geocoder.ca/?premium_api=1
 * **Terms of Service**: http://geocoder.ca/?terms=1
 * **Limitations**: "Under no circumstances can our data be re-distributed or re-sold by anyone to other parties without our written permission."
 
@@ -177,6 +177,9 @@ The [Google Places Search API](https://developers.google.com/places/web-service/
 * **Region**: world
 * **SSL support**: yes
 * **Languages**: The preferred language of address elements in the result. Language code must be provided according to RFC 4647 standard.
+* **Extra params**:
+  * `:bounds` - pass NW and SE coordinates as an array of two arrays to bias results towards a viewport
+  * `:country` - pass the country or list of countries using the country code (3 bytes, ISO 3166-1-alpha-3) or the country name, to filter the results
 * **Documentation**: http://developer.here.com/rest-apis/documentation/geocoder
 * **Terms of Service**: http://developer.here.com/faqs#l&t
 * **Limitations**: ?
@@ -192,18 +195,6 @@ The [Google Places Search API](https://developers.google.com/places/web-service/
 * **Terms of Service**: http://www.esri.com/legal/software-license
 * **Limitations**: Requires API key if results will be stored. Using API key will also remove rate limit.
 * **Notes**: You can specify which projection you want to use by setting, for example: `Geocoder.configure(esri: {outSR: 102100})`. If you will store results, set the flag and provide API key: `Geocoder.configure(esri: {api_key: ["client_id", "client_secret"], for_storage: true})`. If you want to, you can also supply an ESRI token directly: `Geocoder.configure(esri: {token: Geocoder::EsriToken.new('TOKEN', Time.now + 1.day})`
-
-### Mapzen (`:mapzen`)
-
-* **API key**: required
-* **Quota**: 25,000 free requests/month and [ability to purchase more](https://mapzen.com/pricing/)
-* **Region**: world
-* **SSL support**: yes
-* **Languages**: en; see https://mapzen.com/documentation/search/language-codes/
-* **Documentation**: https://mapzen.com/documentation/search/search/
-* **Terms of Service**: http://mapzen.com/terms
-* **Limitations**: [You must provide attribution](https://mapzen.com/rights/)
-* **Notes**: Mapzen is the primary author of Pelias and offers Pelias-as-a-service in free and paid versions https://mapzen.com/pelias.
 
 ### Pelias (`:pelias`)
 
@@ -242,6 +233,19 @@ Data Science Toolkit provides an API whose response format is like Google's but 
 * **Terms of Service**: http://developer.baidu.com/map/law.htm
 * **Limitations**: Only good for non-commercial use. For commercial usage please check http://developer.baidu.com/map/question.htm#qa0013
 * **Notes**: To use Baidu set `Geocoder.configure(lookup: :baidu, api_key: "your_api_key")`.
+
+### Tencent (`:tencent`)
+
+* **API key**: required
+* **Key signup**: http://lbs.qq.com/console/mykey.html
+* **Quota**: 10,000 free requests per day per key. 5 requests per second per key. For increased quota, one must first apply to become a corporate developer and then apply for increased quota.
+* **Region**: China
+* **SSL support**: yes
+* **Languages**: Chinese (Simplified)
+* **Documentation**: http://lbs.qq.com/webservice_v1/guide-geocoder.html (Standard) & http://lbs.qq.com/webservice_v1/guide-gcoder.html (Reverse)
+* **Terms of Service**: http://lbs.qq.com/terms.html
+* **Limitations**: Only works for locations in Greater China (mainland China, Hong Kong, Macau, and Taiwan).
+* **Notes**: To use Tencent, set `Geocoder.configure(lookup: :tencent, api_key: "your_api_key")`.
 
 ### Geocodio (`:geocodio`)
 
@@ -342,7 +346,7 @@ IP Address Lookups
 * **API key**: optional - see http://ipinfo.io/pricing
 * **Quota**: 1,000/day - more with api key
 * **Region**: world
-* **SSL support**: no (not without access key - see http://ipinfo.io/pricing)
+* **SSL support**: yes
 * **Languages**: English
 * **Documentation**: http://ipinfo.io/developers
 * **Terms of Service**: http://ipinfo.io/developers
@@ -454,14 +458,25 @@ IP Address Lookups
 
 ### Ipdata.co (`:ipdata_co`)
 
-* **API key**: optional, see: https://ipdata.co/pricing.html
-* **Quota**: 1500/day (up to 600k with paid API keys)
+* **API key**: required, see: https://ipdata.co/pricing.html
+* **Quota**: 1500/day for free, up to 600k with paid API keys
 * **Region**: world
 * **SSL support**: yes
 * **Languages**: English
 * **Documentation**: https://ipdata.co/docs.html
 * **Terms of Service**: https://ipdata.co/terms.html
 * **Limitations**: ?
+
+### IP2Location (`:ip2location`)
+
+* **API key**: optional (20 free demo queries per day)
+* **Quota**: up to 100k credits with paid API key
+* **Region**: world
+* **SSL support**: yes
+* **Languages**: English
+* **Documentation**: https://www.ip2location.com/web-service
+* **Terms of Service**: https://www.ip2location.com/web-service
+* **Notes**: With the non-free version, specify your desired package: `Geocoder.configure(ip2location: {package: "WSX"})` (see API documentation for package details).
 
 
 Local IP Address Lookups

@@ -13,15 +13,20 @@ module Geocoder::Lookup
     end
 
     def query_url(query)
-      "#{protocol}://#{host}/#{query.sanitized_text}"
+      # Ipdata.co requires that the API key be sent as a query parameter.
+      # It no longer supports API keys sent as headers.
+      "#{protocol}://#{host}/#{query.sanitized_text}?api-key=#{configuration.api_key}"
     end
 
     private # ---------------------------------------------------------------
 
+    def cache_key(query)
+      query_url(query)
+    end
+
     def results(query)
-      Geocoder.configure(:ipdata_co => {:http_headers => { "api-key" => configuration.api_key }}) if configuration.api_key
-      # don't look up a loopback address, just return the stored result
-      return [reserved_result(query.text)] if query.loopback_ip_address?
+      # don't look up a loopback or private address, just return the stored result
+      return [reserved_result(query.text)] if query.internal_ip_address?
       # note: Ipdata.co returns plain text on bad request
       (doc = fetch_data(query)) ? [doc] : []
     end

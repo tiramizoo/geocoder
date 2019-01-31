@@ -5,7 +5,7 @@ require "geocoder/version"
 
 Gem::Specification.new do |s|
   s.name        = "geocoder"
-  s.required_ruby_version = '>= 1.9.3'
+  s.required_ruby_version = '>= 2.0.0'
   s.version     = Geocoder::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Alex Reisner"]
@@ -18,13 +18,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.executables = ["geocode"]
   s.license     = 'MIT'
-
-  s.post_install_message = %q{
-
-NOTE: Geocoder's default IP address lookup has changed from FreeGeoIP.net to IPInfo.io. If you explicitly specify :freegeoip in your configuration you must choose a different IP lookup before FreeGeoIP is discontinued on July 1, 2018. If you do not explicitly specify :freegeoip you do not need to change anything.
-
-}
-
   s.metadata = {
     'source_code_uri' => 'https://github.com/alexreisner/geocoder',
     'changelog_uri'   => 'https://github.com/alexreisner/geocoder/blob/master/CHANGELOG.md'
